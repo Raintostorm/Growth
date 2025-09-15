@@ -1,0 +1,4 @@
+com\example\chat\ChatApplicationTests.class
+com\example\chat\integration\ChatIntegrationTest.class
+com\example\chat\service\AuthServiceTest.class
+com\example\chat\controller\AuthControllerTest.class

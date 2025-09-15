@@ -1,0 +1,81 @@
+# UAT - Test configuration for User Acceptance Testing
+# TECHNICAL CONCEPT: UAT
+
+server:
+  port: 0  # UAT - Random port for testing
+
+spring:
+  application:
+    name: realtime-chat-app-test
+  main:
+    allow-circular-references: true  # RESOLVE SOLUTION - Allow circular dependencies
+  
+  # UAT - Test database configuration
+  datasource:
+    url: jdbc:h2:mem:testdb  # UAT - In-memory database for testing
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  
+  # UAT - JPA configuration for testing
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # UAT - Create and drop schema for each test
+    show-sql: false  # UAT - Disable SQL logging in tests
+    properties:
+      hibernate:
+        format_sql: false  # UAT - Disable SQL formatting in tests
+        dialect: org.hibernate.dialect.H2Dialect
+  
+  # UAT - H2 console disabled for testing
+  h2:
+    console:
+      enabled: false
+
+# UAT - JWT configuration for testing
+app:
+  jwt:
+    secret: testSecretKey12345678901234567890123456789012345678901234567890  # UAT - Test JWT secret
+    expiration: 3600000  # UAT - 1 hour expiration for testing
+
+# UAT - Logging configuration for testing
+logging:
+  level:
+    com.example.chat: INFO  # UAT - Reduced logging for tests
+    org.springframework.security: WARN  # UAT - Reduced security logging
+    org.springframework.web: WARN  # UAT - Reduced web logging
+    org.hibernate.SQL: WARN  # UAT - Reduced SQL logging
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN  # UAT - Reduced parameter logging
+
+  # UAT - Redis configuration for testing (embedded)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 2  # UAT - Reduced pool size for testing
+          max-idle: 2
+          min-idle: 0
+
+  # UAT - Kafka configuration for testing
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: test-chat-group  # UAT - Test consumer group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+# UAT - Management endpoints for testing
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics  # UAT - Limited endpoints for testing
+  endpoint:
+    health:
+      show-details: when-authorized  # UAT - Limited health details

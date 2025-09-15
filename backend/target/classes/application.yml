@@ -1,0 +1,110 @@
+# MAVEN - Application configuration file
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: realtime-chat-app
+  main:
+    allow-circular-references: true  # RESOLVE SOLUTION - Allow circular dependencies
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration  # OAUTH - Exclude OAuth2 auto-configuration
+  
+  # Database Configuration - PERSISTENT DATABASE
+  datasource:
+    url: jdbc:h2:file:./data/chatdb  # PERSISTENT DATABASE - File-based H2 database
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  
+  # JPA Configuration - STRUCTURE LAYER
+  jpa:
+    hibernate:
+      ddl-auto: update  # PERSISTENT DATABASE - Update schema without dropping data
+    show-sql: true  # DEBUGGING THINKING - Show SQL queries
+    properties:
+      hibernate:
+        format_sql: true  # DEBUGGING THINKING - Format SQL output
+        dialect: org.hibernate.dialect.H2Dialect
+  
+  # H2 Console Configuration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+# JWT Configuration
+app:
+  jwt:
+    secret: mySecretKey12345678901234567890123456789012345678901234567890  # JWT - Secret key for token signing
+    expiration: 86400000 # 24 hours in milliseconds  # JWT - Token expiration time
+
+# DEBUGGING THINKING - Logging Configuration
+logging:
+  level:
+    com.example.chat: DEBUG  # DEBUGGING THINKING - Application debug logging
+    org.springframework.security: DEBUG  # DEBUGGING THINKING - Security debug logging
+    org.springframework.web: DEBUG  # DEBUGGING THINKING - Web debug logging
+    org.hibernate.SQL: DEBUG  # DEBUGGING THINKING - SQL query logging
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # DEBUGGING THINKING - SQL parameter logging
+
+  # REDIS Configuration
+  data:
+    redis:
+      host: localhost  # REDIS - Redis server host
+      port: 6379  # REDIS - Redis server port
+      timeout: 2000ms  # REDIS - Connection timeout
+      lettuce:
+        pool:
+          max-active: 8  # REDIS - Maximum active connections
+          max-idle: 8  # REDIS - Maximum idle connections
+          min-idle: 0  # REDIS - Minimum idle connections
+
+  # KAFKA Configuration
+  kafka:
+    bootstrap-servers: localhost:9092  # KAFKA - Bootstrap servers
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer  # KAFKA - Key serializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer  # KAFKA - Value serializer
+    consumer:
+      group-id: chat-group  # KAFKA - Consumer group ID
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer  # KAFKA - Key deserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer  # KAFKA - Value deserializer
+
+  # OAUTH Configuration
+  security:
+    oauth2:
+      client:
+        registration:
+          google:  # OAUTH - Google OAuth2 client
+            client-id: your-google-client-id  # OAUTH - Google client ID
+            client-secret: your-google-client-secret  # OAUTH - Google client secret
+            scope: openid,profile,email  # OAUTH - Google scopes
+          github:  # OAUTH - GitHub OAuth2 client
+            client-id: your-github-client-id  # OAUTH - GitHub client ID
+            client-secret: your-github-client-secret  # OAUTH - GitHub client secret
+            scope: read:user,user:email  # OAUTH - GitHub scopes
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://www.googleapis.com/oauth2/v4/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

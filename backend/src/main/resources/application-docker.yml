@@ -1,0 +1,83 @@
+# DOCKER - Docker-specific configuration
+# TECHNICAL CONCEPT: DOCKER
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: realtime-chat-app
+  main:
+    allow-circular-references: true  # RESOLVE SOLUTION - Allow circular dependencies
+  
+  # DOCKER - Production database configuration
+  datasource:
+    url: jdbc:postgresql://postgres:5432/chatdb  # DOCKER - PostgreSQL in Docker
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: password
+  
+  # DOCKER - JPA configuration for production
+  jpa:
+    hibernate:
+      ddl-auto: update  # DOCKER - Update schema without dropping data
+    show-sql: false  # DOCKER - Disable SQL logging in production
+    properties:
+      hibernate:
+        format_sql: false  # DOCKER - Disable SQL formatting in production
+        dialect: org.hibernate.dialect.PostgreSQLDialect  # DOCKER - PostgreSQL dialect
+  
+  # DOCKER - H2 console disabled in production
+  h2:
+    console:
+      enabled: false
+
+# DOCKER - JWT configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:mySecretKey12345678901234567890123456789012345678901234567890}  # DOCKER - Environment variable
+    expiration: 86400000  # DOCKER - 24 hours expiration
+
+# DOCKER - Logging configuration for production
+logging:
+  level:
+    com.example.chat: INFO  # DOCKER - Production logging level
+    org.springframework.security: WARN  # DOCKER - Reduced security logging
+    org.springframework.web: WARN  # DOCKER - Reduced web logging
+    org.hibernate.SQL: WARN  # DOCKER - Reduced SQL logging
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN  # DOCKER - Reduced parameter logging
+
+  # DOCKER - Redis configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}  # DOCKER - Redis host from environment
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  # DOCKER - Kafka configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}  # DOCKER - Kafka from environment
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: chat-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+# DOCKER - Management endpoints for production
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics  # DOCKER - Limited endpoints for production
+  endpoint:
+    health:
+      show-details: when-authorized  # DOCKER - Limited health details
